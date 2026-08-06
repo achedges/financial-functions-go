@@ -1,0 +1,6 @@
+github.com/achedges/financial-core-go v1.0.0 h1:czQ6l1PDUFpGDmaUe58QOvom1mwjqmPCChMpYSxNkhE=
+github.com/achedges/financial-core-go v1.0.0/go.mod h1:Qmx30pua7xc5uJ+cO/lRuGX51An8GkF8V7IU+qy/yVo=
+github.com/achedges/go-assertions v1.0.5 h1:rX0dT8h/XHPu2p160HIlSFNkJyokZRrKK+vHEAy15pU=
+github.com/achedges/go-assertions v1.0.5/go.mod h1:RvWERfkWjpnf4z3Z3UTb9gsTwSo4nBitDRpm1tDl4/k=
+github.com/shopspring/decimal v1.4.0 h1:bxl37RwXBklmTi0C79JfXCEBD1cqqHt0bbgBAGFp81k=
+github.com/shopspring/decimal v1.4.0/go.mod h1:gawqmDU56v4yIKSwfBSFip1HdCCXN8/+DMd9qYNcwME=
