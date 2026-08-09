@@ -8,10 +8,10 @@ import (
 // Average True Range implementation
 
 type AverageTrueRange struct {
-	n decimal.Decimal
+	n                decimal.Decimal
 	averageTrueRange decimal.Decimal
-	currentBar pricebar.PriceBar
-	previousBar pricebar.PriceBar
+	currentBar       pricebar.PriceBar
+	previousBar      pricebar.PriceBar
 }
 
 func NewAverageTrueRange(bars []pricebar.PriceBar) *AverageTrueRange {
@@ -66,9 +66,9 @@ func CalculateTrueRange(currentBar *pricebar.PriceBar, previousBar *pricebar.Pri
 
 	if currentDiff.GreaterThan(maxPreviousDiff) {
 		return currentDiff
-	} else {
-		return maxPreviousDiff
 	}
+
+	return maxPreviousDiff
 }
 
 func (atr *AverageTrueRange) GetValue() decimal.Decimal {
