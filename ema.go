@@ -1,11 +1,11 @@
-package window
+package functions
 
 import "github.com/shopspring/decimal"
 
 // Exponential Moving Average implementation
 
 type ExponentialMovingAvg struct {
-	windowFunctionBase
+	baseFunction
 	ema    decimal.Decimal
 	price  decimal.Decimal
 	weight decimal.Decimal
@@ -20,7 +20,7 @@ func NewExponentialMovingAvg(period int, prices []float64) *ExponentialMovingAvg
 	}
 
 	ema := &ExponentialMovingAvg{
-		windowFunctionBase: windowFunctionBase{
+		baseFunction: baseFunction{
 			Values: values,
 			Buffer: buffer,
 		},

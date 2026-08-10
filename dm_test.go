@@ -1,7 +1,7 @@
-package window_test
+package functions_test
 
 import (
-	"financial/functions/window"
+	"financial/functions"
 	"testing"
 
 	"github.com/achedges/financial-core-go/pricebar"
@@ -25,7 +25,7 @@ func getDirectionalPriceBars(source [][]float64) []pricebar.PriceBar {
 
 func TestDirectionalMovement_Init(t *testing.T) {
 	bars := getDirectionalPriceBars(initPrices)
-	dm := window.NewDirectionalMovement(14, bars)
+	dm := functions.NewDirectionalMovement(14, bars)
 	assertions.CloseEnough(57.05, dm.TrueRangeSum.InexactFloat64(), 0.01, t)
 	assertions.CloseEnough(12.29, dm.PosDirectionalMovementSum.InexactFloat64(), 0.01, t)
 	assertions.CloseEnough(21.75, dm.NegDirectionalMovementSum.InexactFloat64(), 0.01, t)
@@ -35,7 +35,7 @@ func TestDirectionalMovement_Slide(t *testing.T) {
 	bars := getDirectionalPriceBars(initPrices)
 	slideBars := getDirectionalPriceBars(slidePrices)
 
-	dm := window.NewDirectionalMovement(14, bars)
+	dm := functions.NewDirectionalMovement(14, bars)
 	for i, v := range slideBars {
 		dm.Slide(&v)
 		z := i + (14 * 2) - 1

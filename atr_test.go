@@ -1,7 +1,7 @@
-package window_test
+package functions_test
 
 import (
-	"financial/functions/window"
+	"financial/functions"
 	"testing"
 
 	"github.com/achedges/financial-core-go/pricebar"
@@ -41,14 +41,14 @@ func TestAverageTrueRange_CalculateTrueRange(t *testing.T) {
 		if i > 0 {
 			prevbar = &bars[i-1]
 		}
-		tr, _ := window.CalculateTrueRange(&v, prevbar).Float64()
+		tr, _ := functions.CalculateTrueRange(&v, prevbar).Float64()
 		assertions.EqualFloats(knownRanges[i], tr, t)
 	}
 }
 
 func TestAverageTrueRange_Slide(t *testing.T) {
 	bars := *getPriceBars()
-	atr := window.NewAverageTrueRange(bars[0:7])
+	atr := functions.NewAverageTrueRange(bars[0:7])
 	assertions.CloseEnough(1.428571, atr.GetValueFloat(), 0.000001, t)
 
 	atr.Slide(&bars[7])

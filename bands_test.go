@@ -1,14 +1,14 @@
-package window_test
+package functions_test
 
 import (
-	"financial/functions/window"
+	"financial/functions"
 	"testing"
 
-	"github.com/shopspring/decimal"
 	"github.com/achedges/go-assertions"
+	"github.com/shopspring/decimal"
 )
 
-func checkStats(function *window.BollingerBands, newindex int, t *testing.T) {
+func checkStats(function *functions.BollingerBands, newindex int, t *testing.T) {
 	function.Slide(data[newindex])
 	testindex := (function.Buffer.Index - function.Buffer.Period + 1) % len(dev)
 
@@ -25,7 +25,7 @@ func checkStats(function *window.BollingerBands, newindex int, t *testing.T) {
 
 func TestBollingerBands_LinearBuffer(t *testing.T) {
 	bars := getPriceBarList(len(data))
-	bb := window.NewBollingerBands(period, mapClosePricesFromBars(bars))
+	bb := functions.NewBollingerBands(period, mapClosePricesFromBars(bars))
 	for bb.Buffer.Index < len(data)+10 {
 		newindex := (bb.Buffer.Index + 1) % bb.Buffer.Length
 		checkStats(bb, newindex, t)
@@ -34,7 +34,7 @@ func TestBollingerBands_LinearBuffer(t *testing.T) {
 
 func TestBollingerBands_RingBuffer(t *testing.T) {
 	bars := getPriceBarList(period)
-	bb := window.NewBollingerBands(period, mapClosePricesFromBars(bars))
+	bb := functions.NewBollingerBands(period, mapClosePricesFromBars(bars))
 	for bb.Buffer.Index < len(data)+10 {
 		newindex := (bb.Buffer.Index + 1) % len(data)
 		checkStats(bb, newindex, t)

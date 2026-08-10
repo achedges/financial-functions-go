@@ -1,7 +1,7 @@
-package window_test
+package functions_test
 
 import (
-	"financial/functions/window"
+	"financial/functions"
 	"testing"
 
 	"github.com/achedges/financial-core-go/pricebar"
@@ -26,7 +26,7 @@ func TestRelativeStrengthIndex_Slide(t *testing.T) {
 		*pricebar.New(pricebar.Config{BasisPrice: 61.37}),
 	}
 
-	rsi := window.NewRelativeStrengthIndex(len(bars), bars)
+	rsi := functions.NewRelativeStrengthIndex(len(bars), bars)
 	rsi.Slide(*pricebar.New(pricebar.Config{BasisPrice: 62.50}))
 
 	assertions.CloseEnough(2.39, rsi.RelativeStrength().InexactFloat64(), 0.001, t)

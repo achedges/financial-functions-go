@@ -1,14 +1,14 @@
-package window
+package functions
 
 import "github.com/shopspring/decimal"
 
 // Bollinger Bands implementation
 
 type BollingerBands struct {
-	windowFunctionBase
+	baseFunction
 	standardDeviation *StandardDeviation
-	UpperBand decimal.Decimal
-	LowerBand decimal.Decimal
+	UpperBand         decimal.Decimal
+	LowerBand         decimal.Decimal
 }
 
 func NewBollingerBands(period int, prices []float64) *BollingerBands {
@@ -22,12 +22,12 @@ func NewBollingerBands(period int, prices []float64) *BollingerBands {
 	stdev := NewStandardDeviation(period, prices)
 
 	bb := &BollingerBands{
-		windowFunctionBase: windowFunctionBase{
+		baseFunction: baseFunction{
 			Values: values,
 			Buffer: buffer,
 		},
-		UpperBand: decimal.Zero,
-		LowerBand: decimal.Zero,
+		UpperBand:         decimal.Zero,
+		LowerBand:         decimal.Zero,
 		standardDeviation: stdev,
 	}
 

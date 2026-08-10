@@ -1,11 +1,11 @@
-package window
+package functions
 
 import "github.com/shopspring/decimal"
 
 // Simple Moving Average implementation
 
 type SimpleMovingAvg struct {
-	windowFunctionBase
+	baseFunction
 	valuesum decimal.Decimal
 	average  decimal.Decimal
 }
@@ -19,7 +19,7 @@ func NewSimpleMovingAvg(period int, prices []float64) *SimpleMovingAvg {
 	}
 
 	return &SimpleMovingAvg{
-		windowFunctionBase: windowFunctionBase{
+		baseFunction: baseFunction{
 			Values: values,
 			Buffer: buffer,
 		},

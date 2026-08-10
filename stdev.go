@@ -1,13 +1,13 @@
-package window
+package functions
 
 import "github.com/shopspring/decimal"
 
 // Standard Deviation implementation
 
 type StandardDeviation struct {
-	windowFunctionBase
-	valuesSqSum decimal.Decimal
-	deviation decimal.Decimal
+	baseFunction
+	valuesSqSum   decimal.Decimal
+	deviation     decimal.Decimal
 	movingAverage *SimpleMovingAvg
 }
 
@@ -22,12 +22,12 @@ func NewStandardDeviation(period int, prices []float64) *StandardDeviation {
 	movingAverage := NewSimpleMovingAvg(period, prices)
 
 	stdev := &StandardDeviation{
-		windowFunctionBase: windowFunctionBase{
+		baseFunction: baseFunction{
 			Values: values,
 			Buffer: buffer,
 		},
-		valuesSqSum: decimal.Zero,
-		deviation: decimal.Zero,
+		valuesSqSum:   decimal.Zero,
+		deviation:     decimal.Zero,
 		movingAverage: movingAverage,
 	}
 
@@ -70,8 +70,8 @@ func (stdev *StandardDeviation) Slide(value float64) {
 	stdev.Buffer.Advance()
 }
 
-func (stdev* StandardDeviation) GetValue() decimal.Decimal {
-	return stdev.deviation;
+func (stdev *StandardDeviation) GetValue() decimal.Decimal {
+	return stdev.deviation
 }
 
 func (stdev *StandardDeviation) GetValueFloat() float64 {

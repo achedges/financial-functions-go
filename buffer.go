@@ -1,4 +1,4 @@
-package window
+package functions
 
 type BufferContainer struct {
 	Index  int

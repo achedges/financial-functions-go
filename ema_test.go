@@ -1,7 +1,7 @@
-package window_test
+package functions_test
 
 import (
-	"financial/functions/window"
+	"financial/functions"
 	"testing"
 
 	"github.com/achedges/go-assertions"
@@ -9,7 +9,7 @@ import (
 
 // we can't let the rolling calculation wrap all the way around, since the initial EMA calculation is an SMA
 
-func checkStatsEma(function *window.ExponentialMovingAvg, newindex int, t *testing.T) {
+func checkStatsEma(function *functions.ExponentialMovingAvg, newindex int, t *testing.T) {
 	function.Slide(data[newindex])
 	testindex := (function.Buffer.Index - function.Buffer.Period + 1) % len(ema)
 	assertions.CloseEnough(ema[testindex], function.GetValueFloat(), 0.0001, t)
@@ -17,7 +17,7 @@ func checkStatsEma(function *window.ExponentialMovingAvg, newindex int, t *testi
 
 func TestExponentialMovingAvg_Linear(t *testing.T) {
 	prices := getPriceBarList(len(data))
-	ema := window.NewExponentialMovingAvg(period, mapClosePricesFromBars(prices))
+	ema := functions.NewExponentialMovingAvg(period, mapClosePricesFromBars(prices))
 	for ema.Buffer.Index < len(data)+2 {
 		newindex := (ema.Buffer.Index + 1) % ema.Buffer.Length
 		checkStatsEma(ema, newindex, t)
@@ -26,7 +26,7 @@ func TestExponentialMovingAvg_Linear(t *testing.T) {
 
 func TestExponentialMovingAvg_Ring(t *testing.T) {
 	prices := getPriceBarList(period)
-	ema := window.NewExponentialMovingAvg(period, mapClosePricesFromBars(prices))
+	ema := functions.NewExponentialMovingAvg(period, mapClosePricesFromBars(prices))
 	for ema.Buffer.Index < len(data)+2 {
 		newindex := (ema.Buffer.Index + 1) % len(data)
 		checkStatsEma(ema, newindex, t)

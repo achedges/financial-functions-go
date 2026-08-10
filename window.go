@@ -1,4 +1,4 @@
-package window
+package functions
 
 import (
 	"financial/functions/util"
@@ -17,20 +17,20 @@ type WindowFunction interface {
 	GetValueFloat() float64
 }
 
-type windowFunctionBase struct {
+type baseFunction struct {
 	Values []decimal.Decimal
 	Buffer BufferContainer
 }
 
-func (w *windowFunctionBase) GetLastValue() decimal.Decimal {
+func (w *baseFunction) GetLastValue() decimal.Decimal {
 	return w.Values[w.Buffer.GetUpperBound(0)]
 }
 
-func (w *windowFunctionBase) GetBufferSum() decimal.Decimal {
+func (w *baseFunction) GetBufferSum() decimal.Decimal {
 	return util.Sum(w.Values[w.Buffer.GetLowerBound():w.Buffer.GetUpperBound(1)])
 }
 
-func (w *windowFunctionBase) GetBufferSumSq() decimal.Decimal {
+func (w *baseFunction) GetBufferSumSq() decimal.Decimal {
 	squaredValues := make([]decimal.Decimal, len(w.Values))
 	for i, v := range w.Values[w.Buffer.GetLowerBound():w.Buffer.GetUpperBound(1)] {
 		squaredValues[i] = v.Mul(v)
