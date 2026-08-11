@@ -5,16 +5,14 @@ import "github.com/shopspring/decimal"
 // Standard Deviation implementation
 
 type StandardDeviation struct {
-	baseFunction
+	Buffer        BufferContainer
 	valuesSqSum   decimal.Decimal
 	deviation     decimal.Decimal
 	movingAverage *SimpleMovingAvg
 }
 
 func NewStandardDeviation(period int, prices []float64) *StandardDeviation {
-	buffer := NewBufferContainer(period-1, period, len(prices))
 	values := make([]decimal.Decimal, len(prices))
-
 	for i, v := range prices {
 		values[i] = decimal.NewFromFloat(v)
 	}
@@ -22,10 +20,7 @@ func NewStandardDeviation(period int, prices []float64) *StandardDeviation {
 	movingAverage := NewSimpleMovingAvg(period, prices)
 
 	stdev := &StandardDeviation{
-		baseFunction: baseFunction{
-			Values: values,
-			Buffer: buffer,
-		},
+		Buffer:        NewBufferContainer(values, period-1, period, len(values)),
 		valuesSqSum:   decimal.Zero,
 		deviation:     decimal.Zero,
 		movingAverage: movingAverage,
@@ -46,7 +41,7 @@ func (stdev *StandardDeviation) Calculate() {
 func (stdev *StandardDeviation) SetIndex(i int) {
 	stdev.movingAverage.SetIndex(i)
 	stdev.Buffer.Index = i
-	stdev.valuesSqSum = stdev.GetBufferSumSq()
+	stdev.valuesSqSum = stdev.Buffer.GetSumSq()
 	stdev.Calculate()
 }
 
@@ -60,11 +55,11 @@ func (stdev *StandardDeviation) Slide(value float64) {
 
 	valued := decimal.NewFromFloat(value)
 	two := decimal.NewFromInt32(2)
-	stdev.valuesSqSum = stdev.valuesSqSum.Add(valued.Pow(two).Sub(stdev.Values[oldindex].Pow(two)))
+	stdev.valuesSqSum = stdev.valuesSqSum.Add(valued.Pow(two).Sub(stdev.Buffer.Values[oldindex].Pow(two)))
 	stdev.Calculate()
 
 	if stdev.Buffer.IsRing() {
-		stdev.Values[oldindex] = valued
+		stdev.Buffer.Values[oldindex] = valued
 	}
 
 	stdev.Buffer.Advance()

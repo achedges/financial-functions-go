@@ -5,24 +5,19 @@ import "github.com/shopspring/decimal"
 // Simple Moving Average implementation
 
 type SimpleMovingAvg struct {
-	baseFunction
+	Buffer   BufferContainer
 	valuesum decimal.Decimal
 	average  decimal.Decimal
 }
 
 func NewSimpleMovingAvg(period int, prices []float64) *SimpleMovingAvg {
-	buffer := NewBufferContainer(period-1, period, len(prices))
 	values := make([]decimal.Decimal, len(prices))
-
 	for i, v := range prices {
 		values[i] = decimal.NewFromFloat(v)
 	}
 
 	return &SimpleMovingAvg{
-		baseFunction: baseFunction{
-			Values: values,
-			Buffer: buffer,
-		},
+		Buffer:   NewBufferContainer(values, period-1, period, len(values)),
 		valuesum: decimal.Zero,
 		average:  decimal.Zero,
 	}
@@ -34,7 +29,7 @@ func (avg *SimpleMovingAvg) Calculate() {
 
 func (avg *SimpleMovingAvg) SetIndex(i int) {
 	avg.Buffer.Index = i
-	avg.valuesum = avg.GetBufferSum()
+	avg.valuesum = avg.Buffer.GetSum()
 	avg.Calculate()
 }
 
@@ -45,11 +40,11 @@ func (avg *SimpleMovingAvg) Slide(value float64) {
 		avg.SetIndex(avg.Buffer.Index)
 	}
 
-	avg.valuesum = avg.valuesum.Add(valuedec.Sub(avg.Values[oldindex]))
+	avg.valuesum = avg.valuesum.Add(valuedec.Sub(avg.Buffer.Values[oldindex]))
 	avg.Calculate()
 
 	if avg.Buffer.IsRing() {
-		avg.Values[oldindex] = valuedec
+		avg.Buffer.Values[oldindex] = valuedec
 	}
 
 	avg.Buffer.Advance()

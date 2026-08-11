@@ -5,16 +5,14 @@ import "github.com/shopspring/decimal"
 // Bollinger Bands implementation
 
 type BollingerBands struct {
-	baseFunction
+	Buffer            BufferContainer
 	standardDeviation *StandardDeviation
 	UpperBand         decimal.Decimal
 	LowerBand         decimal.Decimal
 }
 
 func NewBollingerBands(period int, prices []float64) *BollingerBands {
-	buffer := NewBufferContainer(period-1, period, len(prices))
 	values := make([]decimal.Decimal, len(prices))
-
 	for i, v := range prices {
 		values[i] = decimal.NewFromFloat(v)
 	}
@@ -22,10 +20,7 @@ func NewBollingerBands(period int, prices []float64) *BollingerBands {
 	stdev := NewStandardDeviation(period, prices)
 
 	bb := &BollingerBands{
-		baseFunction: baseFunction{
-			Values: values,
-			Buffer: buffer,
-		},
+		Buffer:            NewBufferContainer(values, period-1, period, len(values)),
 		UpperBand:         decimal.Zero,
 		LowerBand:         decimal.Zero,
 		standardDeviation: stdev,
@@ -53,7 +48,7 @@ func (bb *BollingerBands) Slide(value float64) {
 	bb.Calculate()
 
 	if bb.Buffer.IsRing() {
-		bb.Values[oldindex] = decimal.NewFromFloat(value)
+		bb.Buffer.Values[oldindex] = decimal.NewFromFloat(value)
 	}
 
 	bb.Buffer.Advance()

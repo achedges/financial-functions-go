@@ -5,25 +5,20 @@ import "github.com/shopspring/decimal"
 // Exponential Moving Average implementation
 
 type ExponentialMovingAvg struct {
-	baseFunction
+	Buffer BufferContainer
 	ema    decimal.Decimal
 	price  decimal.Decimal
 	weight decimal.Decimal
 }
 
 func NewExponentialMovingAvg(period int, prices []float64) *ExponentialMovingAvg {
-	buffer := NewBufferContainer(period-1, period, len(prices))
 	values := make([]decimal.Decimal, len(prices))
-
 	for i, v := range prices {
 		values[i] = decimal.NewFromFloat(v)
 	}
 
 	ema := &ExponentialMovingAvg{
-		baseFunction: baseFunction{
-			Values: values,
-			Buffer: buffer,
-		},
+		Buffer: NewBufferContainer(values, period-1, period, len(values)),
 		ema:    decimal.Zero,
 		price:  decimal.Zero,
 		weight: decimal.NewFromFloat(2.0).DivRound(decimal.NewFromInt32(int32(period+1)), 6),
@@ -36,7 +31,7 @@ func NewExponentialMovingAvg(period int, prices []float64) *ExponentialMovingAvg
 
 func (avg *ExponentialMovingAvg) Calculate() {
 	if avg.ema == decimal.Zero {
-		sum := avg.GetBufferSum()
+		sum := avg.Buffer.GetSum()
 		avg.ema = sum.DivRound(decimal.NewFromInt32(int32(avg.Buffer.Period)), 6)
 	} else {
 		avg.ema = avg.price.Sub(avg.ema).Mul(avg.weight).Add(avg.ema)
@@ -52,7 +47,7 @@ func (avg *ExponentialMovingAvg) SetIndex(i int) {
 func (avg *ExponentialMovingAvg) Slide(value float64) {
 	avg.price = decimal.NewFromFloat(value)
 	if avg.Buffer.IsRing() {
-		avg.Values[avg.Buffer.GetLowerBound()] = avg.price
+		avg.Buffer.Values[avg.Buffer.GetLowerBound()] = avg.price
 	}
 	avg.Calculate()
 	avg.Buffer.Advance()

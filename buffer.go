@@ -1,13 +1,21 @@
 package functions
 
+import (
+	"financial/functions/util"
+
+	"github.com/shopspring/decimal"
+)
+
 type BufferContainer struct {
+	Values []decimal.Decimal
 	Index  int
 	Period int
 	Length int
 }
 
-func NewBufferContainer(index int, period int, length int) BufferContainer {
+func NewBufferContainer(values []decimal.Decimal, index int, period int, length int) BufferContainer {
 	return BufferContainer{
+		Values: values,
 		Index:  index,
 		Period: period,
 		Length: length,
@@ -29,4 +37,20 @@ func (b *BufferContainer) IsRing() bool {
 
 func (b *BufferContainer) Advance() {
 	b.Index++
+}
+
+func (b *BufferContainer) GetLastValue() decimal.Decimal {
+	return b.Values[b.GetUpperBound(0)]
+}
+
+func (b *BufferContainer) GetSum() decimal.Decimal {
+	return util.Sum(b.Values[b.GetLowerBound():b.GetUpperBound(1)])
+}
+
+func (b *BufferContainer) GetSumSq() decimal.Decimal {
+	squaredValues := make([]decimal.Decimal, len(b.Values))
+	for i, v := range b.Values[b.GetLowerBound():b.GetUpperBound(1)] {
+		squaredValues[i] = v.Mul(v)
+	}
+	return util.Sum(squaredValues)
 }
