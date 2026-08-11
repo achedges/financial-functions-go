@@ -1,11 +1,15 @@
-package functions
+package stats
 
-import "github.com/shopspring/decimal"
+import (
+	"financial/functions/buffer"
+
+	"github.com/shopspring/decimal"
+)
 
 // Standard Deviation implementation
 
 type StandardDeviation struct {
-	Buffer        BufferContainer
+	Buffer        buffer.Container
 	valuesSqSum   decimal.Decimal
 	deviation     decimal.Decimal
 	movingAverage *SimpleMovingAvg
@@ -20,7 +24,7 @@ func NewStandardDeviation(period int, prices []float64) *StandardDeviation {
 	movingAverage := NewSimpleMovingAvg(period, prices)
 
 	stdev := &StandardDeviation{
-		Buffer:        NewBufferContainer(values, period-1, period, len(values)),
+		Buffer:        buffer.NewContainer(values, period-1, period, len(values)),
 		valuesSqSum:   decimal.Zero,
 		deviation:     decimal.Zero,
 		movingAverage: movingAverage,

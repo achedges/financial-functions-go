@@ -1,4 +1,4 @@
-package functions
+package stats
 
 import (
 	"github.com/achedges/financial-core-go/pricebar"

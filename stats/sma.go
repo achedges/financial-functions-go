@@ -1,11 +1,15 @@
-package functions
+package stats
 
-import "github.com/shopspring/decimal"
+import (
+	"financial/functions/buffer"
+
+	"github.com/shopspring/decimal"
+)
 
 // Simple Moving Average implementation
 
 type SimpleMovingAvg struct {
-	Buffer   BufferContainer
+	Buffer   buffer.Container
 	valuesum decimal.Decimal
 	average  decimal.Decimal
 }
@@ -17,7 +21,7 @@ func NewSimpleMovingAvg(period int, prices []float64) *SimpleMovingAvg {
 	}
 
 	return &SimpleMovingAvg{
-		Buffer:   NewBufferContainer(values, period-1, period, len(values)),
+		Buffer:   buffer.NewContainer(values, period-1, period, len(values)),
 		valuesum: decimal.Zero,
 		average:  decimal.Zero,
 	}

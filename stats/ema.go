@@ -1,11 +1,15 @@
-package functions
+package stats
 
-import "github.com/shopspring/decimal"
+import (
+	"financial/functions/buffer"
+
+	"github.com/shopspring/decimal"
+)
 
 // Exponential Moving Average implementation
 
 type ExponentialMovingAvg struct {
-	Buffer BufferContainer
+	Buffer buffer.Container
 	ema    decimal.Decimal
 	price  decimal.Decimal
 	weight decimal.Decimal
@@ -18,7 +22,7 @@ func NewExponentialMovingAvg(period int, prices []float64) *ExponentialMovingAvg
 	}
 
 	ema := &ExponentialMovingAvg{
-		Buffer: NewBufferContainer(values, period-1, period, len(values)),
+		Buffer: buffer.NewContainer(values, period-1, period, len(values)),
 		ema:    decimal.Zero,
 		price:  decimal.Zero,
 		weight: decimal.NewFromFloat(2.0).DivRound(decimal.NewFromInt32(int32(period+1)), 6),

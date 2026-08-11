@@ -1,11 +1,15 @@
-package functions
+package stats
 
-import "github.com/shopspring/decimal"
+import (
+	"financial/functions/buffer"
+
+	"github.com/shopspring/decimal"
+)
 
 // Bollinger Bands implementation
 
 type BollingerBands struct {
-	Buffer            BufferContainer
+	Buffer            buffer.Container
 	standardDeviation *StandardDeviation
 	UpperBand         decimal.Decimal
 	LowerBand         decimal.Decimal
@@ -20,7 +24,7 @@ func NewBollingerBands(period int, prices []float64) *BollingerBands {
 	stdev := NewStandardDeviation(period, prices)
 
 	bb := &BollingerBands{
-		Buffer:            NewBufferContainer(values, period-1, period, len(values)),
+		Buffer:            buffer.NewContainer(values, period-1, period, len(values)),
 		UpperBand:         decimal.Zero,
 		LowerBand:         decimal.Zero,
 		standardDeviation: stdev,

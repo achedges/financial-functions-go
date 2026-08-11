@@ -1,4 +1,4 @@
-package functions_test
+package stats_test
 
 import "github.com/achedges/financial-core-go/pricebar"
 
