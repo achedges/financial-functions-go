@@ -1,7 +1,7 @@
 package stats
 
 import (
-	"github.com/achedges/financial-core-go/pricebar"
+	"github.com/achedges/financial-core-go/candle"
 	"github.com/shopspring/decimal"
 )
 
@@ -10,18 +10,18 @@ import (
 type AverageTrueRange struct {
 	n                decimal.Decimal
 	averageTrueRange decimal.Decimal
-	currentBar       pricebar.PriceBar
-	previousBar      pricebar.PriceBar
+	currentBar       candle.Candle
+	previousBar      candle.Candle
 }
 
-func NewAverageTrueRange(bars []pricebar.PriceBar) *AverageTrueRange {
+func NewAverageTrueRange(bars []candle.Candle) *AverageTrueRange {
 	atr := AverageTrueRange{
 		n: decimal.NewFromInt(int64(len(bars))),
 	}
 
 	numbars := atr.n.IntPart()
 	for i := range numbars {
-		var prev *pricebar.PriceBar = nil
+		var prev *candle.Candle = nil
 		if i > 0 {
 			prev = &bars[i-1]
 		}
@@ -35,7 +35,7 @@ func NewAverageTrueRange(bars []pricebar.PriceBar) *AverageTrueRange {
 	return &atr
 }
 
-func (atr *AverageTrueRange) Slide(newBar *pricebar.PriceBar) {
+func (atr *AverageTrueRange) Slide(newBar *candle.Candle) {
 	atr.previousBar = atr.currentBar
 	atr.currentBar = *newBar
 	trueRange := CalculateTrueRange(&atr.currentBar, &atr.previousBar)
@@ -43,7 +43,7 @@ func (atr *AverageTrueRange) Slide(newBar *pricebar.PriceBar) {
 	atr.averageTrueRange = decay.Add(trueRange).Div(atr.n)
 }
 
-func CalculateTrueRange(currentBar *pricebar.PriceBar, previousBar *pricebar.PriceBar) decimal.Decimal {
+func CalculateTrueRange(currentBar *candle.Candle, previousBar *candle.Candle) decimal.Decimal {
 	currentHigh := decimal.NewFromFloat(currentBar.High)
 	currentLow := decimal.NewFromFloat(currentBar.Low)
 	currentDiff := currentHigh.Sub(currentLow)

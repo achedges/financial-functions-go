@@ -4,7 +4,7 @@ import (
 	"financial/functions/stats"
 	"testing"
 
-	"github.com/achedges/financial-core-go/pricebar"
+	"github.com/achedges/financial-core-go/candle"
 	"github.com/achedges/go-assertions"
 )
 
@@ -21,15 +21,15 @@ var priceData = [][]float64{
 
 var knownRanges = []float64{1.40, 1.50, 1.40, 1.40, 1.30, 1.80, 1.20, 0.70}
 
-func getPriceBars() *[]pricebar.PriceBar {
-	bars := make([]pricebar.PriceBar, len(priceData))
+func getPriceBars() *[]candle.Candle {
+	bars := make([]candle.Candle, len(priceData))
 	for i, v := range priceData {
-		bar := pricebar.New(pricebar.Config{Symbol: "TEST"})
+		bar := candle.New(candle.Config{Symbol: "TEST"})
 		bar.Open = v[0]
 		bar.High = v[1]
 		bar.Low = v[2]
 		bar.Close = v[3]
-		bars[i] = *bar
+		bars[i] = bar
 	}
 	return &bars
 }
@@ -37,7 +37,7 @@ func getPriceBars() *[]pricebar.PriceBar {
 func TestAverageTrueRange_CalculateTrueRange(t *testing.T) {
 	bars := *getPriceBars()
 	for i, v := range bars {
-		var prevbar *pricebar.PriceBar = nil
+		var prevbar *candle.Candle = nil
 		if i > 0 {
 			prevbar = &bars[i-1]
 		}

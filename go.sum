@@ -1,5 +1,9 @@
 github.com/achedges/financial-core-go v1.0.0 h1:czQ6l1PDUFpGDmaUe58QOvom1mwjqmPCChMpYSxNkhE=
 github.com/achedges/financial-core-go v1.0.0/go.mod h1:Qmx30pua7xc5uJ+cO/lRuGX51An8GkF8V7IU+qy/yVo=
+github.com/achedges/financial-core-go v1.2.1 h1:77f+A0gRoXkT2noYtKrw5zZDcrIKKjYnzfePcK6sKpk=
+github.com/achedges/financial-core-go v1.2.1/go.mod h1:Z7spB30L0Irw5zp2oLNSjpwjkXqYttY8DHl1zxKb0r0=
+github.com/achedges/financial-storage-core-go v1.0.0 h1:Fde464w9jUhDradwho2/oi9MxyWRjzkckTaiC8ZVPQo=
+github.com/achedges/financial-storage-core-go v1.0.0/go.mod h1:/Rb3nyTXp7YtF/p08VRTrbTemymMbgAfS1Q93aezk4U=
 github.com/achedges/go-assertions v1.0.5 h1:rX0dT8h/XHPu2p160HIlSFNkJyokZRrKK+vHEAy15pU=
 github.com/achedges/go-assertions v1.0.5/go.mod h1:RvWERfkWjpnf4z3Z3UTb9gsTwSo4nBitDRpm1tDl4/k=
 github.com/achedges/go-assertions v1.0.6 h1:2xIZk7dd9M2qtG4TppYOW4AnWExem5Il7xzX24kpHI4=

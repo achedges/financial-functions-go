@@ -1,7 +1,7 @@
 package stats
 
 import (
-	"github.com/achedges/financial-core-go/pricebar"
+	"github.com/achedges/financial-core-go/candle"
 	"github.com/shopspring/decimal"
 )
 
@@ -20,10 +20,10 @@ type DirectionalMovement struct {
 	DirectionalIndex          decimal.Decimal
 	DirectionalIndexSum       decimal.Decimal
 	AvgDirectionalIndex       decimal.Decimal
-	LastBar                   *pricebar.PriceBar
+	LastBar                   *candle.Candle
 }
 
-func NewDirectionalMovement(period int, bars []pricebar.PriceBar) *DirectionalMovement {
+func NewDirectionalMovement(period int, bars []candle.Candle) *DirectionalMovement {
 	p := decimal.NewFromInt32(int32(period))
 	tr := decimal.Zero
 	positiveDm := decimal.Zero
@@ -94,14 +94,14 @@ func chooseNegativeValue(pos decimal.Decimal, neg decimal.Decimal) decimal.Decim
 	return decimal.Zero
 }
 
-func GetPositiveDm(currentBar *pricebar.PriceBar, previousBar *pricebar.PriceBar) decimal.Decimal {
+func GetPositiveDm(currentBar *candle.Candle, previousBar *candle.Candle) decimal.Decimal {
 	currentHigh := decimal.NewFromFloat(currentBar.High)
 	previousHigh := decimal.NewFromFloat(previousBar.High)
 	d := currentHigh.Sub(previousHigh)
 	return decimal.Max(d, decimal.Zero)
 }
 
-func GetNegativeDm(currentBar *pricebar.PriceBar, previousBar *pricebar.PriceBar) decimal.Decimal {
+func GetNegativeDm(currentBar *candle.Candle, previousBar *candle.Candle) decimal.Decimal {
 	previousLow := decimal.NewFromFloat(previousBar.Low)
 	currentLow := decimal.NewFromFloat(currentBar.Low)
 	d := previousLow.Sub(currentLow)
@@ -112,7 +112,7 @@ func GetSmoothedSum(currentSum decimal.Decimal, newValue decimal.Decimal, period
 	return currentSum.Sub(currentSum.Div(period)).Add(newValue)
 }
 
-func (dm *DirectionalMovement) Slide(newBar *pricebar.PriceBar) {
+func (dm *DirectionalMovement) Slide(newBar *candle.Candle) {
 	dm.TrueRange = CalculateTrueRange(newBar, dm.LastBar)
 	dm.PosDirectionalMovement = GetPositiveDm(newBar, dm.LastBar)
 	dm.NegDirectionalMovement = GetNegativeDm(newBar, dm.LastBar)

@@ -1,7 +1,7 @@
 package stats
 
 import (
-	"github.com/achedges/financial-core-go/pricebar"
+	"github.com/achedges/financial-core-go/candle"
 	"github.com/shopspring/decimal"
 )
 
@@ -9,12 +9,12 @@ import (
 
 type RelativeStrengthIndex struct {
 	period           int
-	barsWindow       []pricebar.PriceBar
+	barsWindow       []candle.Candle
 	relativeStrength decimal.Decimal
 	rsi              decimal.Decimal
 }
 
-func NewRelativeStrengthIndex(period int, bars []pricebar.PriceBar) *RelativeStrengthIndex {
+func NewRelativeStrengthIndex(period int, bars []candle.Candle) *RelativeStrengthIndex {
 	rsi := RelativeStrengthIndex{
 		period:     period,
 		barsWindow: bars,
@@ -64,7 +64,7 @@ func (rsi *RelativeStrengthIndex) Calculate() {
 	rsi.rsi = onehundred.Sub(onehundred.Div(rsi.relativeStrength.Add(one)))
 }
 
-func (rsi *RelativeStrengthIndex) Slide(bar pricebar.PriceBar) {
+func (rsi *RelativeStrengthIndex) Slide(bar candle.Candle) {
 	if len(rsi.barsWindow) == rsi.period {
 		rsi.barsWindow = rsi.barsWindow[1:] // remove first element
 	}

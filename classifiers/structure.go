@@ -4,11 +4,11 @@ import (
 	"financial/functions/pivots"
 	"math"
 
-	"github.com/achedges/financial-core-go/pricebar"
+	"github.com/achedges/financial-core-go/candle"
 )
 
 type MarketStructureClassifier struct {
-	bars                 []pricebar.PriceBar
+	bars                 []candle.Candle
 	highPivots           []int
 	lowPivots            []int
 	trendClassification  TrendClassification
@@ -46,21 +46,21 @@ func (msc *MarketStructureClassifier) GetLowPivotDiff() float64 {
 	return msc.lowPivotDiff
 }
 
-func (msc *MarketStructureClassifier) Classify(bars []pricebar.PriceBar) TrendClassification {
+func (msc *MarketStructureClassifier) Classify(bars []candle.Candle) TrendClassification {
 	msc.bars = bars
 	msc.highPivotDiff = 0.0
 	msc.lowPivotDiff = 0.0
 
-	msc.highPivots = pivots.Get(pivots.Params[pricebar.PriceBar]{
+	msc.highPivots = pivots.Get(pivots.Params[candle.Candle]{
 		Values:         msc.bars,
-		ComparisonFunc: func(a pricebar.PriceBar, b pricebar.PriceBar) bool { return a.High >= b.High },
-		DifferenceFunc: func(a pricebar.PriceBar, b pricebar.PriceBar) float64 { return a.High - b.High },
+		ComparisonFunc: func(a candle.Candle, b candle.Candle) bool { return a.High >= b.High },
+		DifferenceFunc: func(a candle.Candle, b candle.Candle) float64 { return a.High - b.High },
 	})
 
-	msc.lowPivots = pivots.Get(pivots.Params[pricebar.PriceBar]{
+	msc.lowPivots = pivots.Get(pivots.Params[candle.Candle]{
 		Values:         msc.bars,
-		ComparisonFunc: func(a pricebar.PriceBar, b pricebar.PriceBar) bool { return a.Low <= b.Low },
-		DifferenceFunc: func(a pricebar.PriceBar, b pricebar.PriceBar) float64 { return b.Low - a.Low },
+		ComparisonFunc: func(a candle.Candle, b candle.Candle) bool { return a.Low <= b.Low },
+		DifferenceFunc: func(a candle.Candle, b candle.Candle) float64 { return b.Low - a.Low },
 	})
 
 	if len(msc.highPivots) <= 1 || len(msc.lowPivots) <= 1 {
@@ -115,7 +115,7 @@ func (msc *MarketStructureClassifier) Classify(bars []pricebar.PriceBar) TrendCl
 	return msc.trendClassification
 }
 
-func (msc *MarketStructureClassifier) getLastPivot(pivots []int) *pricebar.PriceBar {
+func (msc *MarketStructureClassifier) getLastPivot(pivots []int) *candle.Candle {
 	if pivots == nil || len(pivots) == 0 {
 		return nil
 	}
@@ -128,11 +128,11 @@ func (msc *MarketStructureClassifier) getLastPivot(pivots []int) *pricebar.Price
 	return &msc.bars[lastPivot]
 }
 
-func (msc *MarketStructureClassifier) GetLastHighPivot() *pricebar.PriceBar {
+func (msc *MarketStructureClassifier) GetLastHighPivot() *candle.Candle {
 	return msc.getLastPivot(msc.highPivots)
 }
 
-func (msc *MarketStructureClassifier) GetLastLowPivot() *pricebar.PriceBar {
+func (msc *MarketStructureClassifier) GetLastLowPivot() *candle.Candle {
 	return msc.getLastPivot(msc.lowPivots)
 }
 

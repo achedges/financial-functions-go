@@ -24,3 +24,12 @@ const (
 	TweezerTop
 	EveningStar
 )
+
+type ThresholdQualifier string
+
+const (
+	SlopeSingle     ThresholdQualifier = "SlopeSingle"
+	SlopeDouble     ThresholdQualifier = "SlopeDouble"
+	MagnitudeSingle ThresholdQualifier = "MagnitudeSingle"
+	MagnitudeDouble ThresholdQualifier = "MagnitudeDouble"
+)

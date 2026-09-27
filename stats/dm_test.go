@@ -4,21 +4,21 @@ import (
 	"financial/functions/stats"
 	"testing"
 
-	"github.com/achedges/financial-core-go/pricebar"
+	"github.com/achedges/financial-core-go/candle"
 	"github.com/achedges/go-assertions"
 )
 
-func getDirectionalPriceBars(source [][]float64) []pricebar.PriceBar {
-	bars := make([]pricebar.PriceBar, len(source))
+func getDirectionalPriceBars(source [][]float64) []candle.Candle {
+	bars := make([]candle.Candle, len(source))
 	for i, v := range source {
-		barConfig := pricebar.Config{
+		barConfig := candle.Config{
 			Symbol: "TEST",
 		}
-		bar := pricebar.New(barConfig)
+		bar := candle.New(barConfig)
 		bar.High = v[0]
 		bar.Low = v[1]
 		bar.Close = v[2]
-		bars[i] = *bar
+		bars[i] = bar
 	}
 	return bars
 }

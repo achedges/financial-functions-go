@@ -5,15 +5,15 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/achedges/financial-core-go/pricebar"
+	"github.com/achedges/financial-core-go/candle"
 	"github.com/achedges/go-assertions"
 )
 
-func getRandomBars() []pricebar.PriceBar {
+func getRandomBars() []candle.Candle {
 	random := rand.New(rand.NewSource(1234))
-	bars := make([]pricebar.PriceBar, 20)
+	bars := make([]candle.Candle, 20)
 	for i := range 20 {
-		bars[i] = *pricebar.New(pricebar.Config{
+		bars[i] = candle.New(candle.Config{
 			Symbol:     "TEST",
 			BasisPrice: 20.0 + random.Float64(),
 		})
