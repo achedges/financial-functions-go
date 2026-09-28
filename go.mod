@@ -1,4 +1,4 @@
-module financial/functions
+module github.com/achedges/financial-functions-go
 
 go 1.26
 

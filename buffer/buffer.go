@@ -1,8 +1,7 @@
 package buffer
 
 import (
-	"financial/functions/util"
-
+	"github.com/achedges/financial-functions-go/util"
 	"github.com/shopspring/decimal"
 )
 

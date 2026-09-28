@@ -1,11 +1,11 @@
 package classifiers_test
 
 import (
-	"financial/functions/classifiers"
 	"math/rand"
 	"testing"
 
 	"github.com/achedges/financial-core-go/candle"
+	"github.com/achedges/financial-functions-go/classifiers"
 	"github.com/achedges/go-assertions"
 )
 

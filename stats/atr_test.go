@@ -1,10 +1,10 @@
 package stats_test
 
 import (
-	"financial/functions/stats"
 	"testing"
 
 	"github.com/achedges/financial-core-go/candle"
+	"github.com/achedges/financial-functions-go/stats"
 	"github.com/achedges/go-assertions"
 )
 

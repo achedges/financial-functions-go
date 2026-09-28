@@ -1,9 +1,8 @@
 package classifiers
 
 import (
-	"financial/functions/pivots"
-
 	"github.com/achedges/financial-core-go/candle"
+	"github.com/achedges/financial-functions-go/pivots"
 )
 
 type MarketStructureClassifier struct {

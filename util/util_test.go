@@ -1,9 +1,9 @@
 package util_test
 
 import (
-	"financial/functions/util"
 	"testing"
 
+	"github.com/achedges/financial-functions-go/util"
 	"github.com/achedges/go-assertions"
 	"github.com/shopspring/decimal"
 )

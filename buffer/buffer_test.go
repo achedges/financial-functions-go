@@ -1,9 +1,9 @@
 package buffer_test
 
 import (
-	"financial/functions/buffer"
 	"testing"
 
+	"github.com/achedges/financial-functions-go/buffer"
 	"github.com/achedges/go-assertions"
 	"github.com/shopspring/decimal"
 )

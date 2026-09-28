@@ -1,9 +1,9 @@
 package pivots_test
 
 import (
-	"financial/functions/pivots"
 	"testing"
 
+	"github.com/achedges/financial-functions-go/pivots"
 	"github.com/achedges/go-assertions"
 )
 

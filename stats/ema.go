@@ -1,8 +1,7 @@
 package stats
 
 import (
-	"financial/functions/buffer"
-
+	"github.com/achedges/financial-functions-go/buffer"
 	"github.com/shopspring/decimal"
 )
 
