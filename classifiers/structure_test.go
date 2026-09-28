@@ -31,7 +31,7 @@ func TestMarketStructureClassifier_init(t *testing.T) {
 	assertions.EqualFloats(0.5, classifier2.GetStrongTrendThreshold(), t)
 }
 
-func TestMarketStructureClassifier_GetLastPivots(t *testing.T) {
+func TestMarketStructureClassifier_GetLastHighLowPivots(t *testing.T) {
 	cls := classifiers.NewMarketStructure(classifiers.DefaultMarketStructureConfig)
 
 	assertions.True(cls.GetLastHighPivot() == nil, t)
@@ -59,41 +59,86 @@ func TestMarketStructureClassifier_GetLastPivots(t *testing.T) {
 	assertions.EqualInts(18, cls.GetLastLowPivotIndex(), t)
 }
 
-func TestMarketStructureClassifier_Mixed(t *testing.T) {
-	cls := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
-		StrongTrendThreshold: 1.0,
-	})
+func TestMarketStructureClassifier_GetFirstHighLowPivots(t *testing.T) {
+	cls := classifiers.NewMarketStructure(classifiers.DefaultMarketStructureConfig)
+
+	assertions.True(cls.GetFirstHighPivot() == nil, t)
+	assertions.True(cls.GetFirstLowPivot() == nil, t)
 
 	bars := getRandomBars()
+	// generate an ambiguous structure
+	bars[4].High = 24.0
+	bars[14].High = 22.0
+	bars[8].Low = 16.0
+	bars[18].Low = 18.0
+	cls.Classify(bars)
 
-	// base case, not enough pivots identified
-	trendClass := cls.Classify(bars)
-	assertions.True(trendClass == classifiers.Mixed, t)
+	firstHighPivot := cls.GetFirstHighPivot()
+	firstLowPivot := cls.GetFirstLowPivot()
+
+	if firstHighPivot == nil || firstLowPivot == nil {
+		t.FailNow()
+		return
+	}
+
+	assertions.EqualFloats(24.0, cls.GetFirstHighPivot().High, t)
+	assertions.EqualFloats(16.0, cls.GetFirstLowPivot().Low, t)
+	assertions.EqualInts(4, cls.GetFirstHighPivotIndex(), t)
+	assertions.EqualInts(8, cls.GetFirstLowPivotIndex(), t)
+}
+
+func TestMarketStructureClassifier_Mixed(t *testing.T) {
+	bars := getRandomBars()
+	slopeClassifier := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+		StrongTrendThreshold: 1.0,
+		ThresholdQualifier:   classifiers.SlopeDouble,
+	})
+	magnitudeClassifier := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+		StrongTrendThreshold: 1.0,
+		ThresholdQualifier:   classifiers.MagnitudeDouble,
+	})
 
 	// generate a perfectly flat structure
 	bars[4].High = 22.0
 	bars[14].High = 22.0
 	bars[8].Low = 18.0
 	bars[18].Low = 18.0
-	trendClass = cls.Classify(bars)
+
+	trendClass := slopeClassifier.Classify(bars)
 	assertions.True(trendClass == classifiers.Mixed, t)
-	assertions.EqualFloats(0.0, cls.GetHighPivotDiff(), t)
-	assertions.EqualFloats(0.0, cls.GetLowPivotDiff(), t)
+	assertions.EqualFloats(0.0, slopeClassifier.GetHighPivotDiff(), t)
+	assertions.EqualFloats(0.0, slopeClassifier.GetLowPivotDiff(), t)
+
+	trendClass = magnitudeClassifier.Classify(bars)
+	assertions.True(trendClass == classifiers.Mixed, t)
+	assertions.EqualFloats(0.0, magnitudeClassifier.GetHighPivotDiff(), t)
+	assertions.EqualFloats(0.0, magnitudeClassifier.GetLowPivotDiff(), t)
 
 	// generate an ambiguous structure
 	bars[4].High = 24.0
 	bars[14].High = 22.0
 	bars[8].Low = 16.0
 	bars[18].Low = 18.0
-	trendClass = cls.Classify(bars)
+
+	trendClass = slopeClassifier.Classify(bars)
 	assertions.True(trendClass == classifiers.Mixed, t)
-	assertions.EqualFloats(-2.0, cls.GetHighPivotDiff(), t)
-	assertions.EqualFloats(2.0, cls.GetLowPivotDiff(), t)
+	assertions.CloseEnough(-0.96, slopeClassifier.GetHighPivotDiff(), 0.01, t)
+	assertions.CloseEnough(0.76, slopeClassifier.GetLowPivotDiff(), 0.01, t)
+
+	trendClass = magnitudeClassifier.Classify(bars)
+	assertions.True(trendClass == classifiers.Mixed, t)
+	assertions.EqualFloats(-2.0, magnitudeClassifier.GetHighPivotDiff(), t)
+	assertions.EqualFloats(2.0, magnitudeClassifier.GetLowPivotDiff(), t)
 }
 
 func TestMarketStructureClassifier_WeakUp(t *testing.T) {
-	cls := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+	slopeClassifier := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
 		StrongTrendThreshold: 1.0,
+		ThresholdQualifier:   classifiers.SlopeDouble,
+	})
+	magnitudeClassifier := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+		StrongTrendThreshold: 1.0,
+		ThresholdQualifier:   classifiers.MagnitudeDouble,
 	})
 
 	bars := getRandomBars()
@@ -101,15 +146,26 @@ func TestMarketStructureClassifier_WeakUp(t *testing.T) {
 	bars[14].High = 22.95 // just under 1.0
 	bars[8].Low = 18.0
 	bars[18].Low = 18.95 // just under 1.0
-	trendClass := cls.Classify(bars)
+
+	trendClass := slopeClassifier.Classify(bars)
 	assertions.True(trendClass == classifiers.WeakUp, t)
-	assertions.CloseEnough(0.95, cls.GetHighPivotDiff(), 0.001, t)
-	assertions.CloseEnough(0.95, cls.GetLowPivotDiff(), 0.001, t)
+	assertions.CloseEnough(0.62, slopeClassifier.GetHighPivotDiff(), 0.01, t)
+	assertions.CloseEnough(0.61, slopeClassifier.GetLowPivotDiff(), 0.01, t)
+
+	trendClass = magnitudeClassifier.Classify(bars)
+	assertions.True(trendClass == classifiers.WeakUp, t)
+	assertions.CloseEnough(0.95, magnitudeClassifier.GetHighPivotDiff(), 0.01, t)
+	assertions.CloseEnough(0.95, magnitudeClassifier.GetLowPivotDiff(), 0.01, t)
 }
 
 func TestMarketStructureClassifier_WeakDown(t *testing.T) {
-	cls := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+	slopeClassifier := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
 		StrongTrendThreshold: 1.0,
+		ThresholdQualifier:   classifiers.SlopeDouble,
+	})
+	magnitudeClassifier := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+		StrongTrendThreshold: 1.0,
+		ThresholdQualifier:   classifiers.MagnitudeDouble,
 	})
 
 	bars := getRandomBars()
@@ -117,15 +173,26 @@ func TestMarketStructureClassifier_WeakDown(t *testing.T) {
 	bars[14].High = 21.05 // just under 1.0
 	bars[8].Low = 18.0
 	bars[18].Low = 17.05 // just under 1.0
-	trendClass := cls.Classify(bars)
+
+	trendClass := slopeClassifier.Classify(bars)
 	assertions.True(trendClass == classifiers.WeakDown, t)
-	assertions.CloseEnough(-0.95, cls.GetHighPivotDiff(), 0.001, t)
-	assertions.CloseEnough(-0.95, cls.GetLowPivotDiff(), 0.001, t)
+	assertions.CloseEnough(-0.92, slopeClassifier.GetHighPivotDiff(), 0.01, t)
+	assertions.CloseEnough(-0.46, slopeClassifier.GetLowPivotDiff(), 0.01, t)
+
+	trendClass = magnitudeClassifier.Classify(bars)
+	assertions.True(trendClass == classifiers.WeakDown, t)
+	assertions.CloseEnough(-0.95, magnitudeClassifier.GetHighPivotDiff(), 0.01, t)
+	assertions.CloseEnough(-0.95, magnitudeClassifier.GetLowPivotDiff(), 0.01, t)
 }
 
 func TestMarketStructureClassifier_StrongUp(t *testing.T) {
-	cls := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+	slopeClassifier := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
 		StrongTrendThreshold: 0.1,
+		ThresholdQualifier:   classifiers.SlopeDouble,
+	})
+	magnitudeClassifier := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+		StrongTrendThreshold: 0.1,
+		ThresholdQualifier:   classifiers.MagnitudeDouble,
 	})
 
 	bars := getRandomBars()
@@ -133,24 +200,93 @@ func TestMarketStructureClassifier_StrongUp(t *testing.T) {
 	bars[14].High = 23.05 // just over 1.0
 	bars[8].Low = 18.0
 	bars[18].Low = 19.05 // just over 1.0
-	trendClass := cls.Classify(bars)
+
+	trendClass := slopeClassifier.Classify(bars)
 	assertions.True(trendClass == classifiers.StrongUp, t)
-	assertions.CloseEnough(1.05, cls.GetHighPivotDiff(), 0.001, t)
-	assertions.CloseEnough(1.05, cls.GetLowPivotDiff(), 0.001, t)
+	assertions.CloseEnough(0.66, slopeClassifier.GetHighPivotDiff(), 0.01, t)
+	assertions.CloseEnough(0.66, slopeClassifier.GetLowPivotDiff(), 0.01, t)
+
+	trendClass = magnitudeClassifier.Classify(bars)
+	assertions.True(trendClass == classifiers.StrongUp, t)
+	assertions.CloseEnough(1.05, magnitudeClassifier.GetHighPivotDiff(), 0.01, t)
+	assertions.CloseEnough(1.05, magnitudeClassifier.GetLowPivotDiff(), 0.01, t)
+
+	// same test but Single requirement
+
+	slopeClassifier = classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+		StrongTrendThreshold: 0.1,
+		ThresholdQualifier:   classifiers.SlopeSingle,
+	})
+	magnitudeClassifier = classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+		StrongTrendThreshold: 0.1,
+		ThresholdQualifier:   classifiers.MagnitudeSingle,
+	})
+
+	bars[4].High = 22.0
+	bars[14].High = 23.05 // just over 1.0
+	bars[8].Low = 18.0
+	bars[18].Low = 18.0 // just under 1.0
+
+	trendClass = slopeClassifier.Classify(bars)
+	assertions.True(trendClass == classifiers.StrongUp, t)
+	assertions.CloseEnough(0.66, slopeClassifier.GetHighPivotDiff(), 0.01, t)
+	assertions.CloseEnough(0.0, slopeClassifier.GetLowPivotDiff(), 0.01, t)
+
+	trendClass = magnitudeClassifier.Classify(bars)
+	assertions.True(trendClass == classifiers.StrongUp, t)
+	assertions.CloseEnough(1.05, magnitudeClassifier.GetHighPivotDiff(), 0.01, t)
+	assertions.CloseEnough(0, magnitudeClassifier.GetLowPivotDiff(), 0.01, t)
 }
 
 func TestMarketStructureClassifier_StrongDown(t *testing.T) {
-	cls := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+	slopeClassifier := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
 		StrongTrendThreshold: 0.1,
+		ThresholdQualifier:   classifiers.SlopeDouble,
+	})
+	magnitudeClassifier := classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+		StrongTrendThreshold: 0.1,
+		ThresholdQualifier:   classifiers.MagnitudeDouble,
 	})
 
 	bars := getRandomBars()
 	bars[4].High = 22.0
-	bars[14].High = 20.95 // just over 1.0
+	bars[14].High = 20.95 // just under 0.1
 	bars[8].Low = 18.0
-	bars[18].Low = 16.95 // just over 1.0
-	trendClass := cls.Classify(bars)
+	bars[18].Low = 16.95 // just under 0.1
+
+	trendClass := slopeClassifier.Classify(bars)
 	assertions.True(trendClass == classifiers.StrongDown, t)
-	assertions.CloseEnough(-1.05, cls.GetHighPivotDiff(), 0.001, t)
-	assertions.CloseEnough(-1.05, cls.GetLowPivotDiff(), 0.001, t)
+	assertions.CloseEnough(-1.02, slopeClassifier.GetHighPivotDiff(), 0.01, t)
+	assertions.CloseEnough(-0.5, slopeClassifier.GetLowPivotDiff(), 0.01, t)
+
+	trendClass = magnitudeClassifier.Classify(bars)
+	assertions.True(trendClass == classifiers.StrongDown, t)
+	assertions.CloseEnough(-1.05, magnitudeClassifier.GetHighPivotDiff(), 0.01, t)
+	assertions.CloseEnough(-1.05, magnitudeClassifier.GetLowPivotDiff(), 0.01, t)
+
+	// same test but with Single requirement
+
+	slopeClassifier = classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+		StrongTrendThreshold: 0.1,
+		ThresholdQualifier:   classifiers.SlopeSingle,
+	})
+	magnitudeClassifier = classifiers.NewMarketStructure(classifiers.MarketStructureConfig{
+		StrongTrendThreshold: 0.1,
+		ThresholdQualifier:   classifiers.MagnitudeSingle,
+	})
+
+	bars[4].High = 22.0
+	bars[14].High = 22.0 // just under 0.1
+	bars[8].Low = 18.0
+	bars[18].Low = 16.95 // just under 0.1
+
+	trendClass = slopeClassifier.Classify(bars)
+	assertions.True(trendClass == classifiers.StrongDown, t)
+	assertions.CloseEnough(0.0, slopeClassifier.GetHighPivotDiff(), 0.01, t)
+	assertions.CloseEnough(-0.5, slopeClassifier.GetLowPivotDiff(), 0.01, t)
+
+	trendClass = magnitudeClassifier.Classify(bars)
+	assertions.True(trendClass == classifiers.StrongDown, t)
+	assertions.CloseEnough(0.0, magnitudeClassifier.GetHighPivotDiff(), 0.01, t)
+	assertions.CloseEnough(-1.05, magnitudeClassifier.GetLowPivotDiff(), 0.01, t)
 }
